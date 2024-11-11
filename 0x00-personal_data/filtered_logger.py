@@ -3,6 +3,9 @@
 Filter logger module
 """
 import re
+import os
+import mysql.connector
+from mysql.connector import connection
 from typing import List
 import logging
 
@@ -49,3 +52,19 @@ def get_logger() -> logging.Logger:
     logger.addHandler(handler)
 
     return logger
+
+
+def get_db():
+    """Connect to the MySQL database using credentials from env variables."""
+    db_user = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    db_password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    db_host = os.getenv("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME", "")
+    connection = mysql.connector.connect(
+        host=db_host,
+        port=3306,
+        user=db_user,
+        password=db_password,
+        database=db_name,
+    )
+    return connection
