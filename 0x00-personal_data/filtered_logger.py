@@ -5,7 +5,6 @@ Filter logger module
 import re
 import os
 import mysql.connector
-from mysql.connector import connection
 from typing import List
 import logging
 
