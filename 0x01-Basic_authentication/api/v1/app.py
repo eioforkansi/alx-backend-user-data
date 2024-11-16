@@ -24,25 +24,22 @@ if auth_type == 'auth':
     auth = Auth()
 
 @app.before_request
-def before_request():
-    """Filter requests before they reach route handlers."""
-    print(f"Processing request path: {request.path}")
-
-    if auth is None:
-        return # No auth system defines, proceed as is
-    
-    # Paths that don't require authentication
-    safe_paths = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
-    if request.path in safe_paths:
-        return
-
-    # Check if the Authorization header is valid
-    if auth.authorization_header(request) is None:
-        abort(401) # Unauthorized
-
-    # Check if the current user is valid
-    if auth.current_user(request) is None:
-        abort(403) #Forbidden
+def authenticate_user():
+    """Authenticates a user before processing a request.
+    """
+    if auth:
+        excluded_paths = [
+            '/api/v1/status/',
+            '/api/v1/unauthorized/',
+            '/api/v1/forbidden/',
+        ]
+        if auth.require_auth(request.path, excluded_paths):
+            auth_header = auth.authorization_header(request)
+            user = auth.current_user(request)
+            if auth_header is None:
+                abort(401)
+            if user is None:
+                abort(403)
 
 @app.errorhandler(401)
 def unauthorized(error) -> str:

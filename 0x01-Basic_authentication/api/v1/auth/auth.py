@@ -20,17 +20,14 @@ class Auth:
         Returns:
             bool: True if the path requires authentication, False otherwise.
         """
-        if path is None:
+        if path is None or not excluded_paths:
             return True
 
-        if not excluded_paths:
-            return True
-
-        if not path.endswith('/'):
-            path += '/'
+        processed_path = path.rstrip('/') + '/'
 
         for excluded_path in excluded_paths:
-            if path.startswith(excluded_path):
+            processed_excluded_path = excluded_path.rstrip('/') + '/'
+            if processed_path == processed_excluded_path:
                 return False
 
         return True
